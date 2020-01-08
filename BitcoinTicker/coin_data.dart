@@ -1,3 +1,6 @@
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 const List<String> currenciesList = [
   'AUD',
   'BRL',
@@ -28,4 +31,24 @@ const List<String> cryptoList = [
   'LTC',
 ];
 
-class CoinData {}
+class CoinData {
+  Future<List<double>> getData(String money) async {
+    List<double> price = [];
+
+    for (String coin in cryptoList) {
+      String url =
+          'https://apiv2.bitcoinaverage.com/indices/global/ticker/$coin$money';
+      http.Response response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        price.add(data['last']);
+      } else {
+        print(response.statusCode);
+        return null;
+      }
+    }
+
+    return price;
+  }
+}
